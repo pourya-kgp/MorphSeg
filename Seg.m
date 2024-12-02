@@ -13,13 +13,17 @@ close all
 clc
 
 % Read the source image
-i0 = imread ('D:\GitHub\MorphSeg\Pierre_Belon_s_Book\Page_005.jpg');
+i_in = imread ('D:\GitHub\MorphSeg\Pierre_Belon_s_Book\Page_495.jpg');
 
+% ---------------------------------------- Preprocessing
 % Reduce the size of the image to remove the areas that do not consist of any data (blank areas)
-i0 = i0 (1500:5200 , 1:2600);
+i0 = i_in (1700:end , 1:2450);
 
 % Convert it to binary image
-i1 = im2bw (i0 , 0.5);
+hist = imhist (i0);
+hist_vall = find ((hist(50:200) < 5) == 1);
+vall = (hist_vall(1) + hist_vall(end))/500 + 0.2;
+i1 = im2bw (i0 , vall);
 
 % Enhance the image
 se = strel ('square' , 3);
@@ -30,7 +34,8 @@ i3 = ~i2;
 
 % Enhance the image to get rid of the small connected components
 i4 = bwareaopen (i3 , 35);
-clear i2 i3
+%clear i_in i2 i3 hist hist_vall vall
+% ----------------------------------------
 
 % Separating text from non-text (level 1) 
 se = strel ('line' , 19 , 45);
@@ -43,7 +48,7 @@ i8 = imreconstruct (i7 , i6);
 i9 = i4 - i8;
 TEXT = im2bw (i9 , 0.9);
 NONTEXT = i4 - TEXT;
-clear i5 i6 i7 i8 i9
+%clear i5 i6 i7 i8 i9
 
 % Separating figures from non-figures (level 2)
 se  = strel ('square' , 50);
@@ -54,7 +59,7 @@ i12 = imreconstruct (i11 , i10);
 i13 = NONTEXT - i12;
 NONFIGURES = im2bw (i13 , 0.9);
 FIGURES = NONTEXT - NONFIGURES;
-clear i10 i11 i12 i13
+%clear i10 i11 i12 i13
 
 % Separating stripes from drop capitals (level 3) 
 se  = strel ('square' , 50);
@@ -66,7 +71,7 @@ i18 = imreconstruct (i17 , i16);
 i19 = NONFIGURES - i18;
 DROPCAPITALS  = im2bw (i19 , 0.9);
 STRIPES = NONFIGURES - DROPCAPITALS;
-clear i15 i16 i17 i18 i19 NONFIGURES
+%clear i15 i16 i17 i18 i19 NONFIGURES
 
 % Separating annotations from text matter (level 2) 
 se  = strel ('line' , 351 , 90);
@@ -78,7 +83,7 @@ i23 = imreconstruct (i22 , i21);
 i24 = TEXT - i23;
 ANNOTATIONS = im2bw (i24 , 0.9);
 TEXTMATTER = TEXT - ANNOTATIONS;
-clear i20 i21 i22 i23 i24 TEXT
+%clear i20 i21 i22 i23 i24 TEXT
 
 % Negative the separated images to normal mode
 FIGURES = ~FIGURES;
