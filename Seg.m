@@ -30,7 +30,6 @@ i3 = ~i2;
 
 % Enhance the image to get rid of the small connected components
 i4 = bwareaopen (i3 , 35);
-clear i1 i2 i3 se1
 
 % Separating text from non-text (level 1) 
 se2 = strel ('line' , 19 , 45);
@@ -43,7 +42,6 @@ i8 = imreconstruct (i7 , i6);
 i9 = i4 - i8;
 TEXT = im2bw (i9 , 0.9);
 NONTEXT = i4 - TEXT;
-clear i4 i5 i6 i7 i8 i9 i10 se2 se3 se4
 
 % Separating figures from non-figures (level 2)
 se5 = strel ('square' , 50);
@@ -54,7 +52,6 @@ i13 = imreconstruct (i12 , i11);
 i14 = NONTEXT - i13;
 NONFIGURES = im2bw (i14 , 0.9);
 FIGURES = NONTEXT - NONFIGURES;
-clear i11 i12 i13 i14 i15 se5 se6
 
 % Separating stripes from drop capitals (level 3) 
 se7 = strel ('square' , 50);
@@ -66,7 +63,6 @@ i19 = imreconstruct (i18 , i17);
 i20 = NONFIGURES - i19;
 DROPCAPITALS  = im2bw (i20 , 0.9);
 STRIPES = NONFIGURES - DROPCAPITALS;
-clear i16 i17 i18 i19 i20 i21 se7 se8 NONFIGURES
 
 % Separating annotations from text matter (level 2) 
 se9 = strel ('line' , 351 , 90);
@@ -78,7 +74,6 @@ i25 = imreconstruct (i24 , i23);
 i26 = TEXT - i25;
 ANNOTATIONS = im2bw (i26 , 0.9);
 TEXTMATTER = TEXT - ANNOTATIONS;
-clear i22 i23 i24 i25 i26 i27 se9 se10 TEXT
 
 % Negative the separated images to normal mode
 FIGURES = ~FIGURES;
