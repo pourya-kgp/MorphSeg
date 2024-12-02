@@ -13,7 +13,7 @@ close all
 clc
 
 % Read the source image
-i_in = imread ('D:\GitHub\MorphSeg\Pierre_Belon_s_Book\Page_495.jpg');
+i_in = imread ('D:\GitHub\MorphSeg\Pierre_Belon_s_Book\Page_045.jpg');
 
 % ---------------------------------------- Preprocessing
 % Reduce the size of the image to remove the areas that do not consist of any data (blank areas)
@@ -22,15 +22,15 @@ i0 = i_in (1700:end , 1:2450);
 % Convert it to binary image
 hist = imhist (i0);
 hist_vall = find ((hist(50:200) < 5) == 1);
-vall = (hist_vall(1) + hist_vall(end))/500 + 0.2;
-i1 = im2bw (i0 , vall);
+valley = (hist_vall(1) + hist_vall(end))/500 + 0.2;
+i1 = im2bw (i0 , valley);
+
+% Negative the image
+i2 = ~i1;
 
 % Enhance the image
 se = strel ('square' , 3);
-i2 = imclose (i1 , se);
-
-% Negative the image
-i3 = ~i2;
+i3 = imclose (i2 , se);
 
 % Enhance the image to get rid of the small connected components
 i4 = bwareaopen (i3 , 35);
