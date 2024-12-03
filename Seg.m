@@ -13,7 +13,7 @@ close all
 clc
 
 % Read the source image
-i_in = imread ('D:\GitHub\MorphSeg\Pierre_Belon_s_Book\Page_045.jpg');
+i_in = imread ('D:\GitHub\MorphSeg\Pierre_Belon_s_Book\Page_298.jpg');
 
 % ---------------------------------------- Preprocessing
 % Reduce the size of the image to remove the areas that do not consist of any data (blank areas)
@@ -33,22 +33,35 @@ se = strel ('square' , 3);
 i3 = imclose (i2 , se);
 
 % Enhance the image to get rid of the small connected components
-i4 = bwareaopen (i3 , 35);
+i4 = bwareaopen (i2 , 35);
 %clear i_in i2 i3 hist hist_vall vall
 % ----------------------------------------
 
-% Separating text from non-text (level 1) 
-se = strel ('line' , 19 , 45);
-i5 = imclose (i4 , se);
-se = strel ('line' , 19 , 135);
-i6 = imclose (i5 , se);
-se = strel ('rectangle' , [70 10]);
-i7 = imopen (i6 , se);
-i8 = imreconstruct (i7 , i6);
-i9 = i4 - i8;
-TEXT = im2bw (i9 , 0.9);
-NONTEXT = i4 - TEXT;
-%clear i5 i6 i7 i8 i9
+% ---------------------------------------- Separating text from non-text (level 1) 
+% Reinforcement (closing) of the regions oriented in all directions except 0 and 90
+angle = [30 60 120 150];
+i_close = i4;
+for i= 1:4
+    se = strel ('line' , 10 , angle(i));
+    i_close = imclose (i_close , se);
+    %figure , imshow (i_close)
+end
+
+% Suppression (opening) of the text set
+se = strel ('rectangle' , [60 10]);
+i_open = imopen (i_close , se);
+%figure , imshow (i_open)
+
+% Reconstruction the non-text part
+i_recon = imreconstruct (i_open , i_close);
+%figure , imshow (i_recon)
+NONTEXT = i4 & i_recon;
+figure , imshow (NONTEXT)
+
+% Extracting the text part
+TEXT = i4 - NONTEXT;
+figure , imshow (TEXT)
+% ----------------------------------------
 
 % Separating figures from non-figures (level 2)
 se  = strel ('square' , 50);
