@@ -8,12 +8,12 @@
 % Revision Date : 2024/12/03
 % ----------------------------------------------------------------------------------------------------
 
-clear all 
+%clear all 
 close all
 clc
 
 % Read the source image
-i_in = imread ('D:\GitHub\MorphSeg\Pierre_Belon_s_Book\Page_404.jpg');
+i_in = imread ('D:\GitHub\MorphSeg\Pierre_Belon_s_Book\Page_075.jpg');
 
 % ------------------------------ Preprocessing
 % Reduce the size of the image to remove the areas that do not consist of any data (blank areas)
@@ -62,7 +62,7 @@ NONTEXT = i_prepro & i_recon;
 
 % 5. Extracting the text parts (Difference)
 TEXT = i_prepro - NONTEXT;
-%figure , imshow (TEXT) , title ('TEXT')
+figure , imshow (TEXT) , title ('TEXT')
 
 % ------------------------------ Separating figures from non-figures (level 2)
 % 1. Creating "strong" objects (Closing with an isotropic structuring element)
@@ -109,16 +109,32 @@ DROPCAPITALS = NONFIGURES - STRIPES;
 %figure , imshow (DROPCAPITALS) , title ('DROPCAPITALS')
 
 % ------------------------------ Separating annotations from text matter (level 2) 
-se  = strel ('line' , 351 , 90);
-i20 = imclose (TEXT , se);
-i21 = imfill (i20 , 'holes');
-se  = strel ('line' , 251 , 0);
-i22 = imerode (i21 , se);
-i23 = imreconstruct (i22 , i21);
-i24 = TEXT - i23;
-ANNOTATIONS = im2bw (i24 , 0.9);
-TEXTMATTER = TEXT - ANNOTATIONS;
-%clear i20 i21 i22 i23 i24 TEXT
+% 1. Creation of vertical pseudo-convex hulls (Directional closings in the direction of
+% the main text (horizontal) and filling)
+se  = strel ('line' , 150 , 90);
+i_close = imclose (TEXT , se);
+figure , imshow (i_close) , title ('closed')
+i_fill = imfill (i_close , 'holes');
+figure , imshow (i_fill) , title ('filled')
+
+% 2. Creation of markers of text matter (Erosion)
+se  = strel ('line' , 300 , 0);
+i_erode = imerode (i_fill , se);
+figure , imshow (i_erode) , title ('eroded')
+
+% 3. Identification of text matter (Reconstruction & intersection)
+i_recon = imreconstruct (i_erode , i_fill);
+figure , imshow (i_recon) , title ('reconstructed')
+TEXTMATTER = TEXT & i_recon;
+figure , imshow (TEXTMATTER) , title ('TEXTMATTER')
+
+% 4. Identification of annotations (Difference)
+ANNOTATIONS = TEXT - TEXTMATTER;
+figure , imshow (ANNOTATIONS) , title ('ANNOTATIONS')
+
+%clear i_bin i_close i_erode i_fill i_hist i_in i_neg i_open i_prepro i_recon
+%clear angle hist_vall i se valley
+%clear TEXT NONTEXT NONFIGURES
 
 % Negative the separated images to normal mode
 FIGURES = ~FIGURES;
