@@ -5,7 +5,7 @@
 %                 Authors: Isabel Granado, Pedro Pina, Fernando Muge
 % File Name     : Seg.m
 % Creation Date : 2012/03/15
-% Revision Date : 2024/12/03
+% Revision Date : 2024/12/04
 % ----------------------------------------------------------------------------------------------------
 
 tic
@@ -15,7 +15,7 @@ tic
 %clc
 
 % Read the source image
-i_in = imread ('D:\GitHub\MorphSeg\Pierre_Belon_s_Book\Page_142.jpg');
+i_in = imread ('D:\GitHub\MorphSeg\Pierre_Belon_s_Book\Page_495.jpg');
 
 % ------------------------------ Preprocessing
 % Reduce the size of the image to remove the areas that do not consist of any data (blank areas)
@@ -68,12 +68,12 @@ TEXT = i_prepro - NONTEXT;
 
 % ------------------------------ Separating figures from non-figures (level 2)
 % 1. Creating "strong" objects (Closing with an isotropic structuring element)
-se  = strel ('square' , 50);
+se  = strel ('square' , 75);
 i_close = imclose (NONTEXT , se);
 %figure , imshow (i_close) , title ('closed')
 
 % 2. Creation of a marker of the figures (Erosion with an isotropic structuring element)
-se  = strel ('square' , 370);
+se  = strel ('square' , 375);
 i_erode = imerode (i_close , se);
 %figure , imshow (i_erode) , title ('eroded')
 
@@ -96,7 +96,7 @@ i_fill = imfill (i_close , 'holes');
 %figure , imshow (i_fill) , title ('filled')
 
 % 2. Creation of markers of the stripes (Directional erosion along the horizontal direction)
-se  = strel ('line' , 400 , 0);
+se  = strel ('line' , 1000 , 0);
 i_erode = imerode (i_fill , se);
 %figure , imshow (i_erode) , title ('eroded')
 
@@ -113,14 +113,14 @@ DROPCAPITALS = NONFIGURES - STRIPES;
 % ------------------------------ Separating annotations from text matter (level 2) 
 % 1. Creation of vertical pseudo-convex hulls (Directional closings in the direction of
 % the main text (horizontal) and filling)
-se  = strel ('line' , 300 , 90);
+se  = strel ('line' , 200 , 90);
 i_close = imclose (TEXT , se);
 %figure , imshow (i_close) , title ('closed')
 i_fill = imfill (i_close , 'holes');
 %figure , imshow (i_fill) , title ('filled')
 
 % 2. Creation of markers of text matter (Erosion)
-se  = strel ('line' , 500 , 90);
+se  = strel ('line' , 400 , 0);
 i_erode = imerode (i_fill , se);
 %figure , imshow (i_erode) , title ('eroded')
 
